@@ -1,4 +1,4 @@
-//progress: start of 4.2.6 "We can now create a new task item with the content..."
+//progress: start of 4.3.8
 var pageContentEl = document.querySelector('#page-content');
 var taskIdCounter = 0;
 var formEl =  document.querySelector("#task-form");
@@ -102,18 +102,45 @@ var createTaskActions = function(taskId) {
     return actionContainerEl;
 };
 
+formEl.addEventListener("submit", taskFormHandler);
+
+// function for edit button clicks
+var editTask = function(taskId){
+    console.log("editing task #" + taskId);
+    
+    //get task list item element
+    var taskSelected = document.querySelector(".task-item[data-task-id='" + taskId + "']")
+    
+    //get content from task name and type
+    var taskName = taskSelected.querySelector("h3.task-name").textContent;
+    
+    var taskType = taskSelected.querySelector("span.task-type").textContent;
+    
+    document.querySelector("input[name='task-name']").value = taskName;
+    document.querySelector("select[name='task-type']").value = taskType;
+    document.querySelector("#save-task").textContent = "Save Task";
+};
+
+// function for delete button clicks
 var deleteTask = function(taskId){
     var taskSelected = document.querySelector(".task-item[data-task-id='" + taskId + "']")
     taskSelected.remove();
 };
 
-formEl.addEventListener("submit", taskFormHandler);
-
+// handle button click events for the different types of buttons
 var taskButtonHandler = function(event) {
-    console.log(event.target);
+    //get target element from event
+    var targetEl = event.target
     
-    if (event.target.matches(".delete-btn")) {
-        var taskId = event.target.getAttribute("data-task-id");
+    // edit button was clicked
+    if (event.target.matches(".edit-btn")) {
+        var taskId = targetEl.getAttribute("data-task-id");
+        editTask(taskId);
+        
+    }
+    // delete button was clicked
+    else if (event.target.matches(".delete-btn")) {
+        var taskId = targetEl.getAttribute("data-task-id");
         deleteTask(taskId);
     }
 };
