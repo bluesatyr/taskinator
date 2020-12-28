@@ -1,4 +1,4 @@
-//progress: start of 4.3.8
+//progress: start of 4.4.7 - Notice in this statement that we used the draggableElement and not document
 var pageContentEl = document.querySelector('#page-content');
 var taskIdCounter = 0;
 var formEl =  document.querySelector("#task-form");
@@ -59,9 +59,11 @@ var createTaskEl = function(taskDataObj){
     var listItemEl = document.createElement("li");
     listItemEl.className = "task-item";
     
-    
     // add task id as a custom attribute
     listItemEl.setAttribute("data-task-id", taskIdCounter);
+    
+    // make generated list items draggable
+    listItemEl.setAttribute("draggable", "true");
     
     //create div to hold task info and add to the list item
     var taskInfoEl = document.createElement("div");
@@ -190,5 +192,33 @@ var taskButtonHandler = function(event) {
     }
 };
 
+var dragTaskHandler = function(event) {
+    var taskId = event.target.getAttribute("data-task-id");
+    event.dataTransfer.setData("text/plain", taskId);
+    var getId = event.dataTransfer.getData("text/plain");
+    console.log("getId:", getId, typeof getId);
+};
+
+var dropZoneDragHandler = function(event) {
+    var taskListEl = event.target.closest(".task-list");
+    if (taskListEl) {
+        event.preventDefault();
+    }
+};
+
+var dropTaskHandler = function(event) {
+    var id = event.dataTransfer.getData("text/plain");
+    var draggableElement = document.querySelector("[data-task-id='" + id + "']");
+    var dropZoneEl = event.target.closest(".task-list");
+    var statusType = dropZoneEl.id;
+    // set status of task based on dropZone id
+    var statusSelectEl = draggableElement.querySelector("select[name='status-change']");
+    console.log(statusSelectEl);
+    console.dir(statusSelectEl);
+};
+
 pageContentEl.addEventListener("click", taskButtonHandler);
 pageContentEl.addEventListener("change", taskStatusChangeHandler);
+pageContentEl.addEventListener("dragstart", dragTaskHandler);
+pageContentEl.addEventListener("dragover", dropZoneDragHandler);
+pageContentEl.addEventListener("drop", dropTaskHandler);
